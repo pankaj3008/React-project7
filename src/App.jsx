@@ -5,7 +5,7 @@ import { Privateroute } from "./components/PrivateRoutes"
 import { Register } from "./pages/Register"
 import './App.css'
 
-import { Cart } from "./pages/Cart"
+
 import { User } from "./pages/user"
 
 
@@ -21,7 +21,6 @@ function App() {
         <Route path="/register" element={<Register/>}/>
         <Route path="/home" element={<Privateroute> <Home/></Privateroute>}/>
         <Route path="/user" element={<Privateroute> <User/></Privateroute>}/>
-        <Route path="/cart" element={<Privateroute><Cart/></Privateroute>}/>
       </Routes>
     </>
   )

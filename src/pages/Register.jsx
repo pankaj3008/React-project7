@@ -55,6 +55,38 @@ export function Register(){
             dispatch(fetchSuccess());
             console.log(data);
 
+
+  let newList = {
+  owner: data.name,  
+  items: {},
+  sharedWith: {}
+};
+
+
+
+let listRes = await fetch(
+  `https://grocery-user-9cccc-default-rtdb.firebaseio.com/lists.json`,
+  {
+    method: "POST",
+    body: JSON.stringify(newList),
+    headers: { "Content-Type": "application/json" }
+  }
+);
+
+let listData = await listRes.json(); 
+let listID = listData.name; 
+
+await fetch(
+  `https://grocery-user-9cccc-default-rtdb.firebaseio.com/users/${data.name}.json`,
+  {
+    method: "PATCH",
+    body: JSON.stringify({ listID })
+  }
+);
+
+console.log("New ListID created:", listID);
+
+
             alert("User Created Successfully");
             setUser({diet:"veg",email:"" , name:"" , password:""})
             navigate("/");

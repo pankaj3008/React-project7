@@ -3,6 +3,9 @@ import { FiShoppingCart } from "react-icons/fi";
 import { FiTrendingDown } from "react-icons/fi";
 import { LuLeaf } from "react-icons/lu";
 import { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
+import { FaUserAlt } from "react-icons/fa";
+
 
 
 
@@ -18,6 +21,35 @@ export function Home() {
 
     let [data,setData] = useState([])
     let [item,setItem] = useState("");
+let [shoppingList, setShoppingList] = useState([]);
+
+let listID = localStorage.getItem("listID");
+
+
+async function fetchListItems() {
+  if (!listID) return;
+
+  try {
+    let res = await fetch(
+      `https://grocery-user-9cccc-default-rtdb.firebaseio.com/lists/${listID}/items.json`
+    );
+
+    let data = await res.json();
+
+    if (data) {
+    
+      setShoppingList(Object.entries(data));
+    } else {
+      setShoppingList([]); 
+    }
+
+  } catch (error) {
+    console.log("Error fetching list items:", error);
+  }
+}
+
+
+
 
     async function fetchData(){
 
@@ -28,6 +60,8 @@ export function Home() {
             setData(Object.entries(final));
             console.log(Object.entries(final));
 
+            
+
         }catch(e){
             console.log(e.message);
 
@@ -36,28 +70,105 @@ export function Home() {
 
     }
 
+   
+
 
     useEffect(()=>{
         fetchData();
+        fetchListItems();
     },[])
     
 
     function handleItem(e){
       setItem(e.target.value);
       console.log(item);
+    }
+
+
+    function findCategory(name){
+      let itemName = name.toLowerCase();
+
+      for(let [key, value] of data){
+        let apiName = value.name.toLowerCase();
+
+
+        if(apiName == itemName){
+          // console.log(key);
+          return key;
+        }
+      }
+
+      return "other";
+    }
+
+
+    async function addItemToList(listId, itemData){
+
+ if (!listId) {
+    console.error("List ID missing!");
+    return;
+  }
+
+
+      let obj ={
+        method: "POST",
+        body: JSON.stringify(itemData),
+        headers: { "Content-Type": "application/json" }
+      }
+    await fetch(`https://grocery-user-9cccc-default-rtdb.firebaseio.com/lists/${listId}/items.json`,obj);
+
+
+    fetchListItems();
+  }
+
+
+
+    function handleSubmit(e,item){
+
+      
+  e.preventDefault();  
+
+      
+      if (item == ""){
+        alert("please enter item name")
+        return;
+      }
+      let key = findCategory(item);
+      console.log("category:" , data[key])
+      if(key == "other"){
+        alert("Item not found");
+        return;
+      }
+      
+
+        console.log(data[key][1].name);
+        console.log(data[key][1].category);
+
+        let newItem = {
+          name: data[key][1].name,
+          category: data[key][1].category,
+          unit: data[key][1].unit,
+          price : data[key][1].price,
+
+        }
+addItemToList(listID, newItem);
+
+
+
+
+
+      setItem("");
+      
 
     }
 
-    
+    async function DeleteData(itemkey){
 
+      await fetch(`https://grocery-user-9cccc-default-rtdb.firebaseio.com/lists/${listID}/items/${itemkey}.json`,{method:"DELETE"});
+      alert("Item Deletes Successfully")
+      fetchListItems();
 
-
-
-
-
-
-
-
+    }
 
 
 
@@ -65,7 +176,7 @@ export function Home() {
 
   return (
     <div className="page">
-      {/* HERO SECTION */}
+     
       <div className="hero">
         <h1>Smart Grocery Shopping Made Simple</h1>
         <p>
@@ -100,29 +211,57 @@ export function Home() {
         </div>
       </div>
 
-      {/* MAIN GRID */}
+      
       <div className="content">
-        {/* LEFT SIDE — SHOPPING LIST */}
+        
         <div className="shopping card">
           <h2>Shopping List</h2>
-          {/* <p className="sub">1 of 5 items checked</p> */}
+          
 
+                        
           <div className="add-row">
+    <form onSubmit={(e)=>handleSubmit(e, item)}>
+  <input 
+    placeholder="Add new item..."
+    type="text"
+    name="name"
+    id="name" 
+    value={item}
+    onChange={handleItem}
+  />
+
+  <button style={{width:"100px",fontWeight:"600",color:"#ffffff", margin:"10px" , height:"40px", padding:"3px" , borderRadius:"10px", backgroundColor:"#47dc11ff" , border:"0"}} type="submit">ADD</button>
+</form>
+<div style={{ height:"55px" , width:"55px" , display:"flex" , justifyContent:"center" , alignItems:"center"}}>
+
+<NavLink 
+                            to="/user"
+                            style={{
+                              textDecoration: "none",
+                              color: "#3848f6ff",
+                              fontSize: "30px",
+                              fontWeight: "500",
+                              
+                            }}
+                            >
+                            <FaUserAlt />
+                        </NavLink>
+                          </div>
             {/* <select>
               <option>Meat</option>
               <option>Produce</option>
               <option>Pantry</option>
             </select> */}
             
-            <input placeholder="Add new item..."  type="text" name="name" id="name" value={item} onChange={handleItem}/>
-<button onClick={() => handleSubmit(item)}>
+            {/* <input placeholder="Add new item..."  type="text" name="name" id="name" value={item} onChange={handleItem}/>
+<button onClick={(e) => handleSubmit(e,item)}>
   ADD
-</button>
+</button> */}
         </div>
         
 
           {/* LIST SECTIONS */}
-          <div className="list-section">
+          {/* <div className="list-section">
             <div className="category-tag">Produce</div>
             <div className="item">
               <input type="checkbox" />
@@ -130,7 +269,27 @@ export function Home() {
               <span className="price">$3.99</span>
               <span className="remove">✕</span>
             </div>
-          </div>
+          </div> */}
+
+
+          <div className="list-section">
+  <div className="category-tag">Products</div>
+
+  {shoppingList.map((v, i) => (
+    <div className="item" key={i}>
+       <div className="category-tag">{v[1].category}</div>
+      <input type="checkbox" />
+      <span>{v[1].name}</span>
+      <span className="price">${v[1].price}</span>
+      <button style={{width:"40px" , height:"40px" , display:"flex" , alignItems:"center" , padding:"3px" , borderRadius:"10px", backgroundColor:"#ec2f2fff" , border:"0"}} onClick={() => DeleteData(v[0])}><span style={{color:"#ffffff" , fontWeight:"900"}} className="remove">✕</span></button>
+    </div>
+  ))}
+  <div>
+  
+  <h2><strong>Total: {shoppingList.reduce((a,b)=>a+b[1].price,0)}</strong></h2>
+  </div>
+</div>
+
 
           
         </div>

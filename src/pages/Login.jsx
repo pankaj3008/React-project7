@@ -30,11 +30,34 @@ export function Login(){
         dispatch(fetchLoading());
 
         let obj = await fetchData(formData);
-        if(obj?.success){
-            dispatch(fetchSuccess());
-            navigate("/home")
+       if (obj?.success) {
+    dispatch(fetchSuccess());
 
-        }else{
+
+    let usersRes = await fetch("https://grocery-user-9cccc-default-rtdb.firebaseio.com/users.json");
+    let users = await usersRes.json();
+
+    let foundUserId = null;
+    let foundListID = null;
+
+
+    for (let uid in users) {
+      if (users[uid].email === formData.email &&
+          users[uid].password === formData.password) {
+        
+        foundUserId = uid;              
+        foundListID = users[uid].listID;   
+        break;
+      }
+    }
+
+
+    localStorage.setItem("userId", foundUserId);
+    localStorage.setItem("listID", foundListID);
+
+    navigate("/home");
+}
+else{
             dispatch(fetchFailed("Invalid Email or Password"));
             alert("User not found");
         }
