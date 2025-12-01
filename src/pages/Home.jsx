@@ -23,6 +23,7 @@ export function Home() {
     let [item,setItem] = useState("");
 let [shoppingList, setShoppingList] = useState([]);
 
+
 let listID = localStorage.getItem("listID");
 
 
@@ -247,30 +248,11 @@ addItemToList(listID, newItem);
                             <FaUserAlt />
                         </NavLink>
                           </div>
-            {/* <select>
-              <option>Meat</option>
-              <option>Produce</option>
-              <option>Pantry</option>
-            </select> */}
-            
-            {/* <input placeholder="Add new item..."  type="text" name="name" id="name" value={item} onChange={handleItem}/>
-<button onClick={(e) => handleSubmit(e,item)}>
-  ADD
-</button> */}
+           
         </div>
         
 
-          {/* LIST SECTIONS */}
-          {/* <div className="list-section">
-            <div className="category-tag">Produce</div>
-            <div className="item">
-              <input type="checkbox" />
-              <span>Tomatoes</span>
-              <span className="price">$3.99</span>
-              <span className="remove">✕</span>
-            </div>
-          </div> */}
-
+         
 
           <div className="list-section">
   <div className="category-tag">Products</div>
@@ -311,39 +293,7 @@ addItemToList(listID, newItem);
             </div>
           </div>
 
-          {/* RECIPE IDEAS */}
-          <div className="recipes card">
-            <h2>Recipe Ideas</h2>
-            <p className="sub">Based on your ingredients</p>
-
-            <div className="recipe-card">
-              <div className="r-img">🍝</div>
-              <div className="r-info">
-                <h3>Tomato Pasta</h3>
-                <div className="badges">
-                  <span className="badge orange">20 min</span>
-                  <span className="badge orange">4 ingredients</span>
-                  <span className="badge light">Easy</span>
-                </div>
-                <p>3/5 ingredients available</p>
-              </div>
-              <button className="view-btn">View Recipe</button>
-            </div>
-
-            <div className="recipe-card">
-              <div className="r-img">🥗</div>
-              <div className="r-info">
-                <h3>Chicken Salad</h3>
-                <div className="badges">
-                  <span className="badge orange">15 min</span>
-                  <span className="badge orange">2 ingredients</span>
-                  <span className="badge light">Easy</span>
-                </div>
-                <p>2/6 ingredients available</p>
-              </div>
-              <button className="view-btn">View Recipe</button>
-            </div>
-          </div>
+          
         </div>
       </div>
     </div>

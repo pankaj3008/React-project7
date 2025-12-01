@@ -12,9 +12,26 @@ export function User() {
   let [userData, setUserData] = useState(null);
   let [popupType, setPopupType] = useState("");
 
-  // Popup input states
+
   let [newName, setNewName] = useState("");
   let [newPass, setNewPass] = useState("");
+
+  let [sharedLists, setSharedLists] = useState([]);
+
+
+
+
+async function fetchSharedLists() {
+  let res = await fetch(
+    `https://grocery-user-9cccc-default-rtdb.firebaseio.com/users/${userId}/sharedLists.json`
+  );
+  let data = await res.json();
+
+  if (data) {
+    setSharedLists(Object.keys(data)); // list IDs
+  }
+}
+
 
   async function fetchUser() {
     let res = await fetch(
@@ -26,10 +43,13 @@ export function User() {
   }
 
   useEffect(() => {
-    if (userId) fetchUser();
+    if (userId) {
+        fetchUser();
+    fetchSharedLists(); 
+    }
   }, []);
 
-  // Update name
+
   async function changeName() {
     if (newName.trim() === "") return alert("Enter valid name");
 
@@ -46,7 +66,6 @@ export function User() {
     fetchUser();
   }
 
-  // Update password
   async function changePassword() {
     if (newPass.trim() === "") return alert("Enter valid password");
 
@@ -62,12 +81,18 @@ export function User() {
     setNewPass("");
   }
 
+  function openList(id) {
+    localStorage.setItem("listID", id);
+    navigate("/home");
+  }
+
+
   function handleLogout() {
     localStorage.clear();
     navigate("/");
   }
 
-  // POPUP LOGIC
+
   let popup = null;
 
   if (popupType === "name") {
@@ -137,6 +162,7 @@ export function User() {
   }
 
   return (
+    <>
     <div className="user-page">
       {popup}
 
@@ -169,6 +195,25 @@ export function User() {
       <hr />
 
       <button onClick={handleLogout}>Logout</button>
+
+
+
     </div>
+
+    <h3>Shared Lists</h3>
+
+{sharedLists.length === 0 ? (
+  <p>No shared lists</p>
+) : (
+  <ul>
+    {sharedLists.map(id => (
+      <li key={id}>
+        List ID: {id}
+        <button onClick={() => openList(id)}>Open</button>
+      </li>
+    ))}
+  </ul>
+)}
+</>
   );
 }

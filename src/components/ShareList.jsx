@@ -19,11 +19,11 @@ export default function ShareList({ listID }) {
     fetchSharedUsers();
   }, []);
 
-  // Add user
+
  async function addUser() {
   if (!addUserId.trim()) return alert("Enter User ID");
 
-  // 🔍 Check if user exists
+
   let userCheck = await fetch(
     `https://grocery-user-9cccc-default-rtdb.firebaseio.com/users/${addUserId}.json`
   );
@@ -34,7 +34,6 @@ export default function ShareList({ listID }) {
     return;
   }
 
-  // ✅ Add user to list
   await fetch(
     `https://grocery-user-9cccc-default-rtdb.firebaseio.com/lists/${listID}/sharedWith.json`,
     {
@@ -43,7 +42,7 @@ export default function ShareList({ listID }) {
     }
   );
 
-  // ✅ Add list to user profile
+
   await fetch(
     `https://grocery-user-9cccc-default-rtdb.firebaseio.com/users/${addUserId}/sharedLists.json`,
     {
@@ -59,7 +58,7 @@ export default function ShareList({ listID }) {
 }
 
 
-  // Remove user
+
   async function removeUser(uid) {
     await fetch(
       `https://grocery-user-9cccc-default-rtdb.firebaseio.com/lists/${listID}/sharedWith/${uid}.json`,
